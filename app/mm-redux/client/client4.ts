@@ -1,26 +1,26 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {analytics} from '@init/analytics.ts';
-import {buildQueryString, isMinimumServerVersion} from '@mm-redux/utils/helpers';
-import {cleanUrlForLogging} from '@mm-redux/utils/sentry';
-import {UserProfile, UserStatus} from '@mm-redux/types/users';
-import {Team} from '@mm-redux/types/teams';
+import {Bot, BotPatch} from '@mm-redux/types/bots';
 import {Channel, ChannelModerationPatch} from '@mm-redux/types/channels';
-import {Post} from '@mm-redux/types/posts';
+import {Command, DialogSubmission, IncomingWebhook, OAuthApp, OutgoingWebhook} from '@mm-redux/types/integrations';
+import {UserProfile, UserStatus} from '@mm-redux/types/users';
+import {buildQueryString, isMinimumServerVersion} from '@mm-redux/utils/helpers';
+
+import {Config} from '@mm-redux/types/config';
+import {CustomEmoji} from '@mm-redux/types/emojis';
+import {General} from '../constants';
 import {Job} from '@mm-redux/types/jobs';
+import {Options} from '@mm-redux/types/client4';
+import {Post} from '@mm-redux/types/posts';
+import {PreferenceType} from '@mm-redux/types/preferences';
 import {Role} from '@mm-redux/types/roles';
 import {Scheme} from '@mm-redux/types/schemes';
-import {Options} from '@mm-redux/types/client4';
-import {PreferenceType} from '@mm-redux/types/preferences';
-import {IncomingWebhook, OutgoingWebhook, Command, OAuthApp, DialogSubmission} from '@mm-redux/types/integrations';
-import {CustomEmoji} from '@mm-redux/types/emojis';
-import {Config} from '@mm-redux/types/config';
-import {Bot, BotPatch} from '@mm-redux/types/bots';
 import {SyncablePatch} from '@mm-redux/types/groups';
-
+import {Team} from '@mm-redux/types/teams';
+import {analytics} from '@init/analytics.ts';
+import {cleanUrlForLogging} from '@mm-redux/utils/sentry';
 import fetch from './fetch_etag';
-import {General} from '../constants';
 
 const FormData = require('form-data');
 const HEADER_AUTH = 'Authorization';
@@ -1933,10 +1933,11 @@ export default class Client4 {
     };
 
     getClientConfigOld = async () => {
-        return this.doFetch(
+        const a =  this.doFetch(
             `${this.getBaseRoute()}/config/client?format=old`,
             {method: 'get'},
         );
+        return a 
     };
 
     getClientLicenseOld = async () => {

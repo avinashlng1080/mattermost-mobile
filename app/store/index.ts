@@ -1,24 +1,24 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import AsyncStorage from '@react-native-community/async-storage';
 import * as redux from 'redux';
-import {createPersistoid, createTransform, persistReducer, persistStore, Persistor, PersistConfig} from 'redux-persist';
-import {createBlacklistFilter} from 'redux-persist-transform-filter';
-import DeviceInfo from 'react-native-device-info';
 
+import {PersistConfig, Persistor, createPersistoid, createTransform, persistReducer, persistStore} from 'redux-persist';
+import {createReducer, getStoredState} from './helpers';
+import {serialize, transformSet} from './utils';
+
+import AsyncStorage from '@react-native-community/async-storage';
+import DeviceInfo from 'react-native-device-info';
 import {General} from '@mm-redux/constants';
-import serviceReducer from '@mm-redux/reducers';
 import {GenericAction} from '@mm-redux/types/actions';
 import {GlobalState} from '@mm-redux/types/store';
-
-import initialState from '@store/initial_state';
-import appReducer from 'app/reducers';
-
-import {createReducer, getStoredState} from './helpers';
-import {createMiddlewares} from './middlewares';
 import Store from './store';
-import {transformSet, serialize} from './utils';
+import appReducer from 'app/reducers';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import {createBlacklistFilter} from 'redux-persist-transform-filter';
+import {createMiddlewares} from './middlewares';
+import initialState from '@store/initial_state';
+import serviceReducer from '@mm-redux/reducers';
 
 /**
  * Configures and constructs the redux store. Accepts the following parameters:
@@ -200,11 +200,11 @@ export default function configureStore(storage: any, preloadedState: any = {}, o
     const store = redux.createStore(
         persistedReducer,
         baseState,
-        redux.compose(
+        composeWithDevTools( redux.compose(
             redux.applyMiddleware(
                 ...createMiddlewares(options),
             ),
-        ),
+        ))
     );
 
     const persistor = persistStore(store, null);
