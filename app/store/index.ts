@@ -197,14 +197,14 @@ export default function configureStore(storage: any, preloadedState: any = {}, o
     const persistedReducer = persistReducer({...persistConfig}, rootReducer);
     const options: ClientOptions = Object.assign({}, defaultOptions, optionalOptions);
 
+    const composeEnhancers = composeWithDevTools({ trace: true, traceLimit: 25 }); 
+
     const store = redux.createStore(
         persistedReducer,
         baseState,
-        composeWithDevTools( redux.compose(
-            redux.applyMiddleware(
-                ...createMiddlewares(options),
-            ),
-        ))
+        composeEnhancers( 
+            redux.compose(redux.applyMiddleware(...createMiddlewares(options)))
+        )
     );
 
     const persistor = persistStore(store, null);
