@@ -10,15 +10,16 @@ import {
     Platform,
 } from 'react-native';
 
-import FormattedText from 'app/components/formatted_text';
+import FormattedText from '@components/formatted_text';
 import {
     changeOpacity,
     makeStyleSheetFromTheme,
     getKeyboardAppearanceFromTheme,
-} from 'app/utils/theme';
-import {paddingHorizontal as padding} from 'app/components/safe_area_view/iphone_x_spacing';
+} from '@utils/theme';
 
 export default class TextSetting extends PureComponent {
+    static validTypes = ['input', 'textarea', 'number', 'email', 'tel', 'url', 'password'];
+
     static propTypes = {
         id: PropTypes.string.isRequired,
         label: PropTypes.oneOfType([
@@ -39,7 +40,6 @@ export default class TextSetting extends PureComponent {
         onChange: PropTypes.func.isRequired,
         value: PropTypes.string.isRequired,
         multiline: PropTypes.bool,
-        isLandscape: PropTypes.bool.isRequired,
         keyboardType: PropTypes.oneOf([
             'default',
             'number-pad',
@@ -50,6 +50,7 @@ export default class TextSetting extends PureComponent {
             'url',
         ]),
         secureTextEntry: PropTypes.bool,
+        testID: PropTypes.string,
     };
 
     static defaultProps = {
@@ -57,7 +58,6 @@ export default class TextSetting extends PureComponent {
         disabled: false,
         multiline: false,
         keyboardType: 'default',
-        isLandscape: false,
         secureTextEntry: false,
     };
 
@@ -78,8 +78,8 @@ export default class TextSetting extends PureComponent {
             errorText,
             value,
             multiline,
-            isLandscape,
             secureTextEntry,
+            testID,
         } = this.props;
         const style = getStyleSheet(theme);
 
@@ -90,10 +90,17 @@ export default class TextSetting extends PureComponent {
                     style={style.title}
                     id={label.id}
                     defaultMessage={label.defaultMessage}
+                    testID={`${testID}.label_content`}
                 />
             );
         } else if (typeof label === 'string') {
-            labelContent = <Text style={style.title}>{label}</Text>;
+            labelContent = (
+                <Text
+                    style={style.title}
+                    testID={`${testID}.label`}
+                >
+                    {label}
+                </Text>);
         }
 
         let optionalContent;
@@ -150,13 +157,13 @@ export default class TextSetting extends PureComponent {
         const noediting = disabled ? style.disabled : null;
 
         return (
-            <View>
-                <View style={[style.titleContainer, padding(isLandscape)]}>
+            <View testID={testID}>
+                <View style={style.titleContainer}>
                     {labelContent}
                     {asterisk}
                     {optionalContent}
                 </View>
-                <View style={[style.inputContainer, padding(isLandscape), noediting]}>
+                <View style={[style.inputContainer, noediting]}>
                     <View>
                         <TextInput
                             value={value}
@@ -174,10 +181,11 @@ export default class TextSetting extends PureComponent {
                             keyboardType={keyboardType}
                             secureTextEntry={secureTextEntry}
                             keyboardAppearance={getKeyboardAppearanceFromTheme(theme)}
+                            testID={`${testID}.input`}
                         />
                     </View>
                 </View>
-                <View style={padding(isLandscape)}>
+                <View>
                     {disabledTextContent}
                     {helpTextContent}
                     {errorTextContent}

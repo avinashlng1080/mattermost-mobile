@@ -3,17 +3,17 @@
 
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import {SectionList} from 'react-native';
+import {Platform, SectionList} from 'react-native';
 
+import {AT_MENTION_REGEX, AT_MENTION_SEARCH_REGEX} from '@constants/autocomplete';
+import AtMentionItem from '@components/autocomplete/at_mention_item';
+import AutocompleteSectionHeader from '@components/autocomplete/autocomplete_section_header';
+import SpecialMentionItem from '@components/autocomplete/special_mention_item';
+import GroupMentionItem from '@components/autocomplete/at_mention_group/at_mention_group';
 import {RequestStatus} from '@mm-redux/constants';
-
-import {AT_MENTION_REGEX, AT_MENTION_SEARCH_REGEX} from 'app/constants/autocomplete';
-import AtMentionItem from 'app/components/autocomplete/at_mention_item';
-import AutocompleteSectionHeader from 'app/components/autocomplete/autocomplete_section_header';
-import SpecialMentionItem from 'app/components/autocomplete/special_mention_item';
-import GroupMentionItem from 'app/components/autocomplete/at_mention_group/at_mention_group';
-import {makeStyleSheetFromTheme} from 'app/utils/theme';
-import {t} from 'app/utils/i18n';
+import {debounce} from '@mm-redux/actions/helpers';
+import {makeStyleSheetFromTheme} from '@utils/theme';
+import {t} from '@utils/i18n';
 
 export default class AtMention extends PureComponent {
     static propTypes = {
@@ -35,7 +35,6 @@ export default class AtMention extends PureComponent {
         teamMembers: PropTypes.array,
         theme: PropTypes.object.isRequired,
         value: PropTypes.string,
-        isLandscape: PropTypes.bool.isRequired,
         nestedScrollEnabled: PropTypes.bool,
         useChannelMentions: PropTypes.bool.isRequired,
         groups: PropTypes.array,
@@ -56,50 +55,43 @@ export default class AtMention extends PureComponent {
         };
     }
 
-    componentWillReceiveProps(nextProps) {
-        const {groups, inChannel, outChannel, teamMembers, isSearch, matchTerm, requestStatus} = nextProps;
+    runSearch = debounce((currentTeamId, channelId, matchTerm) => {
+        this.props.actions.autocompleteUsers(matchTerm, currentTeamId, channelId);
+    }, 200);
 
-        // Not invoked, render nothing.
-        if (matchTerm === null) {
-            this.setState({
-                sections: [],
-            });
-            return;
-        }
-
-        if (matchTerm !== this.props.matchTerm) {
-            const sections = this.buildSections(nextProps);
-            this.setState({
-                sections,
-            });
-
-            this.props.onResultCountChange(sections.reduce((total, section) => total + section.data.length, 0));
-
-            // Update user autocomplete list with results of server request
-            const {currentTeamId, currentChannelId} = this.props;
-            const channelId = isSearch ? '' : currentChannelId;
-            this.props.actions.autocompleteUsers(matchTerm, currentTeamId, channelId);
-            return;
-        }
-
-        // Server request is complete
-        if (
-            groups !== this.props.groups ||
-                (
-                    requestStatus !== RequestStatus.STARTED &&
-                    (inChannel !== this.props.inChannel || outChannel !== this.props.outChannel || teamMembers !== this.props.teamMembers)
-                )
-        ) {
-            const sections = this.buildSections(nextProps);
-            this.setState({
-                sections,
-            });
-
-            this.props.onResultCountChange(sections.reduce((total, section) => total + section.data.length, 0));
-        }
+    updateSections(sections) {
+        this.setState({sections});
     }
 
     componentDidUpdate(prevProps, prevState) {
+        if (this.props.matchTerm !== prevProps.matchTerm) {
+            if (this.props.matchTerm === null) {
+                this.updateSections([]);
+            } else {
+                const sections = this.buildSections(this.props);
+                this.updateSections(sections);
+
+                this.props.onResultCountChange(sections.reduce((total, section) => total + section.data.length, 0));
+
+                // Update user autocomplete list with results of server request
+                const {currentTeamId, currentChannelId, matchTerm} = this.props;
+                const channelId = this.props.isSearch ? '' : currentChannelId;
+                this.runSearch(currentTeamId, channelId, matchTerm);
+            }
+        }
+        if (this.props.matchTerm !== null && this.props.matchTerm === prevProps.matchTerm) {
+            if (
+                this.props.groups !== prevProps.groups ||
+                    (
+                        this.props.requestStatus !== RequestStatus.STARTED &&
+                        (this.props.inChannel !== prevProps.inChannel || this.props.outChannel !== prevProps.outChannel || this.props.teamMembers !== prevProps.teamMembers)
+                    )
+            ) {
+                const sections = this.buildSections(this.props);
+                this.updateSections(sections);
+                this.props.onResultCountChange(sections.reduce((total, section) => total + section.data.length, 0));
+            }
+        }
         if (prevState.sections.length !== this.state.sections.length && this.state.sections.length === 0) {
             this.props.onResultCountChange(0);
         }
@@ -213,7 +205,6 @@ export default class AtMention extends PureComponent {
                 id={section.id}
                 defaultMessage={section.defaultMessage}
                 theme={this.props.theme}
-                isLandscape={this.props.isLandscape}
                 isFirstSection={isFirstSection}
             />
         );
@@ -266,15 +257,16 @@ export default class AtMention extends PureComponent {
 
         return (
             <SectionList
-                testID='at_mention_suggestion.list'
                 keyboardShouldPersistTaps='always'
                 keyExtractor={this.keyExtractor}
-                style={[style.listView, {maxHeight: maxListHeight}]}
-                sections={sections}
-                renderItem={this.renderItem}
-                renderSectionHeader={this.renderSectionHeader}
                 initialNumToRender={10}
                 nestedScrollEnabled={nestedScrollEnabled}
+                removeClippedSubviews={Platform.OS === 'android'}
+                renderItem={this.renderItem}
+                renderSectionHeader={this.renderSectionHeader}
+                style={[style.listView, {maxHeight: maxListHeight}]}
+                sections={sections}
+                testID='at_mention_suggestion.list'
             />
         );
     }

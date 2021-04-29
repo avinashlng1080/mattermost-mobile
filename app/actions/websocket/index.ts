@@ -2,12 +2,12 @@
 // See LICENSE.txt for license information.
 
 import {loadChannelsForTeam} from '@actions/views/channel';
-import {getPosts} from '@actions/views/post';
+import {getPostsSince} from '@actions/views/post';
 import {loadMe} from '@actions/views/user';
 import {WebsocketEvents} from '@constants';
 import {ChannelTypes, GeneralTypes, PreferenceTypes, TeamTypes, UserTypes, RoleTypes} from '@mm-redux/action_types';
 import {getProfilesByIds, getStatusesByIds} from '@mm-redux/actions/users';
-import {Client4} from '@mm-redux/client';
+import {Client4} from '@client/rest';
 import {General} from '@mm-redux/constants';
 import {getCurrentChannelId, getCurrentChannelStats} from '@mm-redux/selectors/entities/channels';
 import {getConfig} from '@mm-redux/selectors/entities/general';
@@ -44,6 +44,9 @@ import {handleAddEmoji, handleReactionAddedEvent, handleReactionRemovedEvent} fr
 import {handleRoleAddedEvent, handleRoleRemovedEvent, handleRoleUpdatedEvent} from './roles';
 import {handleLeaveTeamEvent, handleUpdateTeamEvent, handleTeamAddedEvent} from './teams';
 import {handleStatusChangedEvent, handleUserAddedEvent, handleUserRemovedEvent, handleUserRoleUpdated, handleUserUpdatedEvent} from './users';
+import {getChannelSinceValue} from '@utils/channels';
+import {getPostIdsInChannel} from '@mm-redux/selectors/entities/posts';
+import {handleRefreshAppsBindings} from './apps';
 
 export function init(additionalOptions: any = {}) {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
@@ -152,7 +155,7 @@ export function doReconnect(now: number) {
                 const currentTeamMembership = me.teamMembers.find((tm: TeamMembership) => tm.team_id === currentTeamId && tm.delete_at === 0);
 
                 if (currentTeamMembership) {
-                    const {data: myData}: any = await dispatch(loadChannelsForTeam(currentTeamId, true));
+                    const {data: myData}: any = await dispatch(loadChannelsForTeam(currentTeamId, true, true));
 
                     if (myData?.channels && myData?.channelMembers) {
                         actions.push({
@@ -168,7 +171,9 @@ export function doReconnect(now: number) {
                         if (!stillMemberOfCurrentChannel || !channelStillExists || (!viewArchivedChannels && channelStillExists.delete_at !== 0)) {
                             EventEmitter.emit(General.SWITCH_TO_DEFAULT_CHANNEL, currentTeamId);
                         } else {
-                            dispatch(getPosts(currentChannelId));
+                            const postIds = getPostIdsInChannel(state, currentChannelId);
+                            const since = getChannelSinceValue(state, currentChannelId, postIds);
+                            dispatch(getPostsSince(currentChannelId, since));
                         }
                     }
 
@@ -373,6 +378,9 @@ function handleEvent(msg: WebSocketMessage) {
             return dispatch(handleOpenDialogEvent(msg));
         case WebsocketEvents.RECEIVED_GROUP:
             return dispatch(handleGroupUpdatedEvent(msg));
+        case WebsocketEvents.APPS_FRAMEWORK_REFRESH_BINDINGS: {
+            return dispatch(handleRefreshAppsBindings());
+        }
         }
 
         return {data: true};

@@ -27,6 +27,7 @@ exports[`ChannelPostList should match snapshot 1`] = `
     indicateNewMessages={true}
     lastPostIndex={-1}
     loadMorePostsVisible={false}
+    location="channel"
     onLoadMoreUp={[Function]}
     onPostPress={[Function]}
     postIds={Array []}
@@ -35,8 +36,8 @@ exports[`ChannelPostList should match snapshot 1`] = `
     renderReplies={true}
     scrollViewNativeID="channel-id"
     showMoreMessagesButton={true}
+    testID="channel.post_list"
   />
-  <Connect(AnnouncementBanner) />
   <Connect(RetryBarIndicator) />
 </ForwardRef(AnimatedComponentWrapper)>
 `;

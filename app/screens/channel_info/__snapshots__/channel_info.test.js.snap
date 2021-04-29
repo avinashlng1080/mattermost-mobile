@@ -1,7 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`channelInfo should match snapshot 1`] = `
-<View
+<RNCSafeAreaView
+  edges={
+    Array [
+      "bottom",
+      "left",
+      "right",
+    ]
+  }
   style={
     Object {
       "flex": 1,
@@ -17,6 +24,7 @@ exports[`channelInfo should match snapshot 1`] = `
         "flex": 1,
       }
     }
+    testID="channel_info.scroll_view"
   >
     <ChannelInfoHeader
       createAt={123}
@@ -25,14 +33,12 @@ exports[`channelInfo should match snapshot 1`] = `
       hasGuests={false}
       header=""
       isArchived={false}
-      isBot={false}
       isGroupConstrained={false}
-      isLandscape={false}
       isTeammateGuest={false}
       memberCount={2}
       onPermalinkPress={[Function]}
       purpose="Purpose"
-      status="status"
+      testID="channel_info.header"
       theme={
         Object {
           "awayIndicator": "#ffbc42",
@@ -78,7 +84,6 @@ exports[`channelInfo should match snapshot 1`] = `
       <React.Fragment>
         <Connect(Favorite)
           channelId="1234"
-          isLandscape={false}
           testID="channel_info.favorite.action"
           theme={
             Object {
@@ -143,7 +148,6 @@ exports[`channelInfo should match snapshot 1`] = `
         />
         <Connect(Mute)
           channelId="1234"
-          isLandscape={false}
           testID="channel_info.mute.action"
           theme={
             Object {
@@ -209,7 +213,6 @@ exports[`channelInfo should match snapshot 1`] = `
         />
         <Connect(IgnoreMentions)
           channelId="1234"
-          isLandscape={false}
           testID="channel_info.ignore_mentions.action"
           theme={
             Object {
@@ -274,7 +277,6 @@ exports[`channelInfo should match snapshot 1`] = `
         />
         <React.Fragment>
           <Connect(NotificationPreference)
-            isLandscape={false}
             testID="channel_info.notification_preference.action"
             theme={
               Object {
@@ -340,8 +342,7 @@ exports[`channelInfo should match snapshot 1`] = `
         </React.Fragment>
         <Connect(Pinned)
           channelId="1234"
-          isLandscape={false}
-          testID="channel_info.pinned.action"
+          testID="channel_info.pinned_messages.action"
           theme={
             Object {
               "awayIndicator": "#ffbc42",
@@ -373,7 +374,6 @@ exports[`channelInfo should match snapshot 1`] = `
           }
         />
         <Connect(ManageMembers)
-          isLandscape={false}
           testID="channel_info.manage_members.action"
           theme={
             Object {
@@ -406,7 +406,6 @@ exports[`channelInfo should match snapshot 1`] = `
           }
         />
         <Connect(AddMembers)
-          isLandscape={false}
           testID="channel_info.add_members.action"
           theme={
             Object {
@@ -439,7 +438,6 @@ exports[`channelInfo should match snapshot 1`] = `
           }
         />
         <Connect(ConvertPrivate)
-          isLandscape={false}
           testID="channel_info.convert_private.action"
           theme={
             Object {
@@ -472,8 +470,38 @@ exports[`channelInfo should match snapshot 1`] = `
           }
         />
         <Connect(EditChannel)
-          isLandscape={false}
           testID="channel_info.edit_channel.action"
+          theme={
+            Object {
+              "awayIndicator": "#ffbc42",
+              "buttonBg": "#166de0",
+              "buttonColor": "#ffffff",
+              "centerChannelBg": "#ffffff",
+              "centerChannelColor": "#3d3c40",
+              "codeTheme": "github",
+              "dndIndicator": "#f74343",
+              "errorTextColor": "#fd5960",
+              "linkColor": "#2389d7",
+              "mentionBg": "#ffffff",
+              "mentionBj": "#ffffff",
+              "mentionColor": "#145dbf",
+              "mentionHighlightBg": "#ffe577",
+              "mentionHighlightLink": "#166de0",
+              "newMessageSeparator": "#ff8800",
+              "onlineIndicator": "#06d6a0",
+              "sidebarBg": "#145dbf",
+              "sidebarHeaderBg": "#1153ab",
+              "sidebarHeaderTextColor": "#ffffff",
+              "sidebarText": "#ffffff",
+              "sidebarTextActiveBorder": "#579eff",
+              "sidebarTextActiveColor": "#ffffff",
+              "sidebarTextHoverBg": "#4578bf",
+              "sidebarUnreadText": "#ffffff",
+              "type": "Mattermost",
+            }
+          }
+        />
+        <Connect(InjectIntl(Component))
           theme={
             Object {
               "awayIndicator": "#ffbc42",
@@ -515,7 +543,7 @@ exports[`channelInfo should match snapshot 1`] = `
     >
       <Connect(Leave)
         close={[Function]}
-        isLandscape={false}
+        testID="channel_info.leave.action"
         theme={
           Object {
             "awayIndicator": "#ffbc42",
@@ -548,7 +576,7 @@ exports[`channelInfo should match snapshot 1`] = `
       />
       <Connect(Archive)
         close={[Function]}
-        isLandscape={false}
+        testID="channel_info.archive.action"
         theme={
           Object {
             "awayIndicator": "#ffbc42",
@@ -581,14 +609,13 @@ exports[`channelInfo should match snapshot 1`] = `
       />
     </View>
   </ScrollView>
-</View>
+</RNCSafeAreaView>
 `;
 
 exports[`channelInfo should not include NotificationPreference for direct message 1`] = `
 <React.Fragment>
   <Connect(Favorite)
     channelId="1234"
-    isLandscape={false}
     testID="channel_info.favorite.action"
     theme={
       Object {
@@ -653,7 +680,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   />
   <Connect(Mute)
     channelId="1234"
-    isLandscape={false}
     testID="channel_info.mute.action"
     theme={
       Object {
@@ -719,7 +745,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   />
   <Connect(IgnoreMentions)
     channelId="1234"
-    isLandscape={false}
     testID="channel_info.ignore_mentions.action"
     theme={
       Object {
@@ -784,7 +809,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   />
   <React.Fragment>
     <Connect(NotificationPreference)
-      isLandscape={false}
       testID="channel_info.notification_preference.action"
       theme={
         Object {
@@ -850,8 +874,7 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   </React.Fragment>
   <Connect(Pinned)
     channelId="1234"
-    isLandscape={false}
-    testID="channel_info.pinned.action"
+    testID="channel_info.pinned_messages.action"
     theme={
       Object {
         "awayIndicator": "#ffbc42",
@@ -883,7 +906,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(ManageMembers)
-    isLandscape={false}
     testID="channel_info.manage_members.action"
     theme={
       Object {
@@ -916,7 +938,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(AddMembers)
-    isLandscape={false}
     testID="channel_info.add_members.action"
     theme={
       Object {
@@ -949,7 +970,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(ConvertPrivate)
-    isLandscape={false}
     testID="channel_info.convert_private.action"
     theme={
       Object {
@@ -982,8 +1002,38 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(EditChannel)
-    isLandscape={false}
     testID="channel_info.edit_channel.action"
+    theme={
+      Object {
+        "awayIndicator": "#ffbc42",
+        "buttonBg": "#166de0",
+        "buttonColor": "#ffffff",
+        "centerChannelBg": "#ffffff",
+        "centerChannelColor": "#3d3c40",
+        "codeTheme": "github",
+        "dndIndicator": "#f74343",
+        "errorTextColor": "#fd5960",
+        "linkColor": "#2389d7",
+        "mentionBg": "#ffffff",
+        "mentionBj": "#ffffff",
+        "mentionColor": "#145dbf",
+        "mentionHighlightBg": "#ffe577",
+        "mentionHighlightLink": "#166de0",
+        "newMessageSeparator": "#ff8800",
+        "onlineIndicator": "#06d6a0",
+        "sidebarBg": "#145dbf",
+        "sidebarHeaderBg": "#1153ab",
+        "sidebarHeaderTextColor": "#ffffff",
+        "sidebarText": "#ffffff",
+        "sidebarTextActiveBorder": "#579eff",
+        "sidebarTextActiveColor": "#ffffff",
+        "sidebarTextHoverBg": "#4578bf",
+        "sidebarUnreadText": "#ffffff",
+        "type": "Mattermost",
+      }
+    }
+  />
+  <Connect(InjectIntl(Component))
     theme={
       Object {
         "awayIndicator": "#ffbc42",
@@ -1021,7 +1071,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
 <React.Fragment>
   <Connect(Favorite)
     channelId="1234"
-    isLandscape={false}
     testID="channel_info.favorite.action"
     theme={
       Object {
@@ -1086,7 +1135,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   />
   <Connect(Mute)
     channelId="1234"
-    isLandscape={false}
     testID="channel_info.mute.action"
     theme={
       Object {
@@ -1152,7 +1200,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   />
   <Connect(IgnoreMentions)
     channelId="1234"
-    isLandscape={false}
     testID="channel_info.ignore_mentions.action"
     theme={
       Object {
@@ -1217,8 +1264,7 @@ exports[`channelInfo should not include NotificationPreference for direct messag
   />
   <Connect(Pinned)
     channelId="1234"
-    isLandscape={false}
-    testID="channel_info.pinned.action"
+    testID="channel_info.pinned_messages.action"
     theme={
       Object {
         "awayIndicator": "#ffbc42",
@@ -1250,7 +1296,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(ManageMembers)
-    isLandscape={false}
     testID="channel_info.manage_members.action"
     theme={
       Object {
@@ -1283,7 +1328,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(AddMembers)
-    isLandscape={false}
     testID="channel_info.add_members.action"
     theme={
       Object {
@@ -1316,7 +1360,6 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(ConvertPrivate)
-    isLandscape={false}
     testID="channel_info.convert_private.action"
     theme={
       Object {
@@ -1349,8 +1392,38 @@ exports[`channelInfo should not include NotificationPreference for direct messag
     }
   />
   <Connect(EditChannel)
-    isLandscape={false}
     testID="channel_info.edit_channel.action"
+    theme={
+      Object {
+        "awayIndicator": "#ffbc42",
+        "buttonBg": "#166de0",
+        "buttonColor": "#ffffff",
+        "centerChannelBg": "#ffffff",
+        "centerChannelColor": "#3d3c40",
+        "codeTheme": "github",
+        "dndIndicator": "#f74343",
+        "errorTextColor": "#fd5960",
+        "linkColor": "#2389d7",
+        "mentionBg": "#ffffff",
+        "mentionBj": "#ffffff",
+        "mentionColor": "#145dbf",
+        "mentionHighlightBg": "#ffe577",
+        "mentionHighlightLink": "#166de0",
+        "newMessageSeparator": "#ff8800",
+        "onlineIndicator": "#06d6a0",
+        "sidebarBg": "#145dbf",
+        "sidebarHeaderBg": "#1153ab",
+        "sidebarHeaderTextColor": "#ffffff",
+        "sidebarText": "#ffffff",
+        "sidebarTextActiveBorder": "#579eff",
+        "sidebarTextActiveColor": "#ffffff",
+        "sidebarTextHoverBg": "#4578bf",
+        "sidebarUnreadText": "#ffffff",
+        "type": "Mattermost",
+      }
+    }
+  />
+  <Connect(InjectIntl(Component))
     theme={
       Object {
         "awayIndicator": "#ffbc42",

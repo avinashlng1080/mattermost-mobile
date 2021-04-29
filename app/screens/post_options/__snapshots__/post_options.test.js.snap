@@ -11,8 +11,8 @@ exports[`PostOptions should match snapshot, no option for system message to user
 >
   <Connect(SlideUpPanel)
     allowStayMiddle={false}
-    initialPosition={322}
-    marginFromTop={278}
+    initialPosition={372}
+    marginFromTop={228}
     onRequestClose={[Function]}
     theme={
       Object {
@@ -52,7 +52,6 @@ exports[`PostOptions should match snapshot, no option for system message to user
     <PostOption
       destructive={false}
       icon="reply-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.reply.action"
       text="Reply"
@@ -88,7 +87,6 @@ exports[`PostOptions should match snapshot, no option for system message to user
     />
     <PostOption
       icon="mark-as-unread"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.markUnread.action"
       text="Mark as Unread"
@@ -125,7 +123,6 @@ exports[`PostOptions should match snapshot, no option for system message to user
     <PostOption
       destructive={false}
       icon="pin-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.pin.action"
       text="Pin to Channel"
@@ -162,7 +159,6 @@ exports[`PostOptions should match snapshot, no option for system message to user
     <PostOption
       destructive={false}
       icon="pencil-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.edit.action"
       text="Edit"
@@ -193,6 +189,18 @@ exports[`PostOptions should match snapshot, no option for system message to user
           "sidebarTextHoverBg": "#4578bf",
           "sidebarUnreadText": "#ffffff",
           "type": "Mattermost",
+        }
+      }
+    />
+    <Connect(InjectIntl(Component))
+      closeWithAnimation={[Function]}
+      post={
+        Object {
+          "channel_id": "channel_id",
+          "id": "post_id",
+          "is_pinned": false,
+          "message": "message",
+          "root_id": "root_id",
         }
       }
     />
@@ -211,8 +219,8 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
 >
   <Connect(SlideUpPanel)
     allowStayMiddle={false}
-    initialPosition={372}
-    marginFromTop={228}
+    initialPosition={422}
+    marginFromTop={178}
     onRequestClose={[Function]}
     theme={
       Object {
@@ -252,7 +260,6 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
     <PostOption
       destructive={false}
       icon="reply-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.reply.action"
       text="Reply"
@@ -288,7 +295,6 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
     />
     <PostOption
       icon="mark-as-unread"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.markUnread.action"
       text="Mark as Unread"
@@ -325,7 +331,6 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
     <PostOption
       destructive={false}
       icon="pin-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.pin.action"
       text="Pin to Channel"
@@ -362,7 +367,6 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
     <PostOption
       destructive={false}
       icon="pencil-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.edit.action"
       text="Edit"
@@ -399,7 +403,6 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
     <PostOption
       destructive={true}
       icon="trash-can-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.delete.action"
       text="Delete"
@@ -430,6 +433,18 @@ exports[`PostOptions should match snapshot, showing Delete option only for syste
           "sidebarTextHoverBg": "#4578bf",
           "sidebarUnreadText": "#ffffff",
           "type": "Mattermost",
+        }
+      }
+    />
+    <Connect(InjectIntl(Component))
+      closeWithAnimation={[Function]}
+      post={
+        Object {
+          "channel_id": "channel_id",
+          "id": "post_id",
+          "is_pinned": false,
+          "message": "message",
+          "root_id": "root_id",
         }
       }
     />
@@ -448,8 +463,8 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
 >
   <Connect(SlideUpPanel)
     allowStayMiddle={false}
-    initialPosition={372}
-    marginFromTop={228}
+    initialPosition={422}
+    marginFromTop={178}
     onRequestClose={[Function]}
     theme={
       Object {
@@ -489,7 +504,6 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
     <PostOption
       destructive={false}
       icon="reply-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.reply.action"
       text="Reply"
@@ -525,7 +539,6 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
     />
     <PostOption
       icon="mark-as-unread"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.markUnread.action"
       text="Mark as Unread"
@@ -562,7 +575,6 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
     <PostOption
       destructive={false}
       icon="pin-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.pin.action"
       text="Pin to Channel"
@@ -599,7 +611,6 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
     <PostOption
       destructive={false}
       icon="pencil-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.edit.action"
       text="Edit"
@@ -636,7 +647,6 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
     <PostOption
       destructive={true}
       icon="trash-can-outline"
-      isLandscape={false}
       onPress={[Function]}
       testID="post.options.delete.action"
       text="Delete"
@@ -667,6 +677,18 @@ exports[`PostOptions should match snapshot, showing all possible options 1`] = `
           "sidebarTextHoverBg": "#4578bf",
           "sidebarUnreadText": "#ffffff",
           "type": "Mattermost",
+        }
+      }
+    />
+    <Connect(InjectIntl(Component))
+      closeWithAnimation={[Function]}
+      post={
+        Object {
+          "channel_id": "channel_id",
+          "id": "post_id",
+          "is_pinned": false,
+          "message": "message",
+          "root_id": "root_id",
         }
       }
     />

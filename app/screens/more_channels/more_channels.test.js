@@ -32,9 +32,12 @@ describe('MoreChannels', () => {
         currentTeamId: 'current_team_id',
         theme: Preferences.THEMES.default,
         componentId: 'component-id',
-        isLandscape: false,
         canShowArchivedChannels: true,
     };
+
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
 
     test('should match snapshot', () => {
         const wrapper = shallow(

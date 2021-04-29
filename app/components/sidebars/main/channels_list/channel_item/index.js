@@ -15,9 +15,8 @@ import {getTheme, getTeammateNameDisplaySetting} from '@mm-redux/selectors/entit
 import {getCurrentUserId, getUser} from '@mm-redux/selectors/entities/users';
 import {getUserIdFromChannelName, isChannelMuted} from '@mm-redux/utils/channel_utils';
 import {displayUsername} from '@mm-redux/utils/user_utils';
-import {isLandscape} from 'app/selectors/device';
-import {getDraftForChannel} from 'app/selectors/views';
-import {isGuest as isGuestUser} from 'app/utils/users';
+import {getDraftForChannel} from '@selectors/views';
+import {isGuest as isGuestUser} from '@utils/users';
 
 import ChannelItem from './channel_item';
 
@@ -25,21 +24,19 @@ function makeMapStateToProps() {
     const getChannel = makeGetChannel();
 
     return (state, ownProps) => {
-        const channel = ownProps.channel || getChannel(state, {id: ownProps.channelId});
+        const channel = ownProps.channel || getChannel(state, {id: ownProps.channelId}) || {};
         const member = getMyChannelMember(state, channel.id);
         const currentUserId = getCurrentUserId(state);
         const channelDraft = getDraftForChannel(state, channel.id);
 
         let displayName = channel.display_name;
-        let isBot = false;
         let isGuest = false;
         let isArchived = channel.delete_at > 0;
+        let teammateId;
 
         if (channel.type === General.DM_CHANNEL) {
-            const teammateId = getUserIdFromChannelName(currentUserId, channel.name);
+            teammateId = getUserIdFromChannelName(currentUserId, channel.name);
             const teammate = getUser(state, teammateId);
-
-            isBot = Boolean(ownProps.isSearchResult ? channel.isBot : teammate?.is_bot); //eslint-disable-line camelcase
 
             if (teammate) {
                 const teammateNameDisplay = getTeammateNameDisplaySetting(state);
@@ -79,14 +76,13 @@ function makeMapStateToProps() {
             displayName,
             hasDraft: Boolean(channelDraft.draft.trim() || channelDraft?.files?.length),
             isArchived,
-            isBot,
             isChannelMuted: isChannelMuted(member),
             isGuest,
-            isLandscape: isLandscape(state),
             isManualUnread: isManuallyUnread(state, ownProps.channelId),
             mentions: member ? member.mention_count : 0,
             shouldHideChannel,
             showUnreadForMsgs,
+            teammateId,
             theme: getTheme(state),
             unreadMsgs,
         };

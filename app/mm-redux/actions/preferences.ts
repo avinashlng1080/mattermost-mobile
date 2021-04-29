@@ -1,6 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
-import {Client4} from '@mm-redux/client';
+import {Client4} from '@client/rest';
 import {Preferences} from '../constants';
 import {PreferenceTypes} from '@mm-redux/action_types';
 import {getMyPreferences as getMyPreferencesSelector, makeGetCategory} from '@mm-redux/selectors/entities/preferences';
@@ -140,9 +140,9 @@ export function saveTheme(teamId: string, theme: {}): ActionFunc {
 
 export function deleteTeamSpecificThemes(): ActionFunc {
     return async (dispatch: DispatchFunc, getState: GetStateFunc) => {
-        const state = getState();
-
         const getCategory: (state: any, preferenceId: string) => Array<PreferenceType> = makeGetCategory();
+
+        const state = getState();
         const themePreferences: Array<PreferenceType> = getCategory(state, Preferences.CATEGORY_THEME);
         const currentUserId = getCurrentUserId(state);
 

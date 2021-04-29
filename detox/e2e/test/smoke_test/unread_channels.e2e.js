@@ -15,22 +15,36 @@ import {
 } from '@support/server_api';
 
 describe('Unread channels', () => {
+    const {
+        goToChannel,
+        closeMainSidebar,
+        openMainSidebar,
+    } = ChannelScreen;
+    const {
+        channelsList,
+        channelsListUnreadIndicator,
+        hasChannelDisplayNameAtIndex,
+    } = MainSidebar;
+    let testUser;
+    let testTeam;
     let newChannel;
     let aChannel;
     let zChannel;
 
     beforeAll(async () => {
-        const {user, channel, team} = await Setup.apiInit();
+        const {channel, team, user} = await Setup.apiInit();
+        testUser = user;
+        testTeam = team;
         newChannel = channel;
 
-        ({channel: aChannel} = await Channel.apiCreateChannel({type: 'O', prefix: 'a-channel', teamId: team.id}));
-        await Channel.apiAddUserToChannel(user.id, aChannel.id);
+        ({channel: aChannel} = await Channel.apiCreateChannel({type: 'O', prefix: 'a-channel', teamId: testTeam.id}));
+        await Channel.apiAddUserToChannel(testUser.id, aChannel.id);
 
-        ({channel: zChannel} = await Channel.apiCreateChannel({type: 'O', prefix: 'z-channel', teamId: team.id}));
-        await Channel.apiAddUserToChannel(user.id, zChannel.id);
+        ({channel: zChannel} = await Channel.apiCreateChannel({type: 'O', prefix: 'z-channel', teamId: testTeam.id}));
+        await Channel.apiAddUserToChannel(testUser.id, zChannel.id);
 
         // # Open channel screen
-        await ChannelScreen.open(user);
+        await ChannelScreen.open(testUser);
     });
 
     afterAll(async () => {
@@ -39,30 +53,51 @@ describe('Unread channels', () => {
 
     it('MM-T3187 Unread channels sort at top', async () => {
         // # Open main sidebar (with at least one unread channel)
-        await ChannelScreen.openMainSidebar();
+        await openMainSidebar();
 
         // * Verify unread channel(s) display at top of channel list (with mentions first, if any), in alphabetical order, with title "Unreads"
         await expect(element(by.text('UNREADS'))).toBeVisible();
-        await MainSidebar.hasChannelAtIndex(0, aChannel.display_name);
-        await MainSidebar.hasChannelAtIndex(1, newChannel.display_name);
-        await MainSidebar.hasChannelAtIndex(2, zChannel.display_name);
+        await hasChannelDisplayNameAtIndex(0, aChannel.display_name);
+        await hasChannelDisplayNameAtIndex(1, newChannel.display_name);
+        await hasChannelDisplayNameAtIndex(2, zChannel.display_name);
+        await closeMainSidebar();
 
         // # Tap an unread channel to view it
-        await MainSidebar.getChannelByDisplayName(aChannel.display_name).tap();
-        await ChannelScreen.openMainSidebar();
-        await MainSidebar.getChannelByDisplayName(newChannel.display_name).tap();
-        await ChannelScreen.openMainSidebar();
-        await MainSidebar.getChannelByDisplayName(zChannel.display_name).tap();
+        await goToChannel(aChannel.display_name);
+        await goToChannel(newChannel.display_name);
+        await goToChannel(zChannel.display_name);
 
         // * Channel you just read is no longer listed in Unreads
-        await ChannelScreen.openMainSidebar();
+        await openMainSidebar();
         await expect(element(by.text('UNREADS'))).not.toBeVisible();
         await expect(element(by.text('PUBLIC CHANNELS'))).toBeVisible();
-        await MainSidebar.hasChannelAtIndex(0, aChannel.display_name);
-        await MainSidebar.hasChannelAtIndex(1, newChannel.display_name);
-        await MainSidebar.hasChannelAtIndex(2, 'Off-Topic');
-        await MainSidebar.hasChannelAtIndex(3, 'Town Square');
-        await MainSidebar.hasChannelAtIndex(4, zChannel.display_name);
-        await MainSidebar.getChannelByDisplayName(aChannel.display_name).tap();
+        await hasChannelDisplayNameAtIndex(0, aChannel.display_name);
+        await hasChannelDisplayNameAtIndex(1, newChannel.display_name);
+        await hasChannelDisplayNameAtIndex(2, 'Off-Topic');
+        await hasChannelDisplayNameAtIndex(3, 'Town Square');
+        await hasChannelDisplayNameAtIndex(4, zChannel.display_name);
+
+        // # Close main sidebar
+        await closeMainSidebar();
+    });
+
+    it('MM-T3188 should display more unreads indicator when unreads are off-screen in channels list', async () => {
+        // # Create 10 unread channels
+        [...Array(10).keys()].forEach(async (key) => {
+            const {channel} = await Channel.apiCreateChannel({type: 'O', prefix: `unread-channel-${key}`, teamId: testTeam.id});
+            await Channel.apiAddUserToChannel(testUser.id, channel.id);
+        });
+
+        // # Open main sidebar (with at least one unread channel)
+        await openMainSidebar();
+
+        // # Scroll to bottom
+        await channelsList.scroll(500, 'down');
+
+        // * Verify more unreads indicator is displayed
+        await expect(channelsListUnreadIndicator).toBeVisible();
+
+        // # Close main sidebar
+        await closeMainSidebar();
     });
 });

@@ -1,6 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import Alert from './alert';
+import {isAndroid, timeouts, wait} from '@support/utils';
+
 class PostOptions {
     testID = {
         postOptions: 'post.options',
@@ -34,14 +37,41 @@ class PostOptions {
     slideUpPanel = element(by.id(this.testID.slideUpPanel));
 
     toBeVisible = async () => {
-        await expect(this.postOptions).toBeVisible();
+        await expect(this.postOptions).toExist();
 
         return postOptions;
     }
 
     close = async () => {
-        await this.postOptions.tap();
+        await this.postOptions.tap({x: 5, y: 10});
         await expect(this.postOptions).not.toBeVisible();
+    }
+
+    deletePost = async ({confirm = true} = {}) => {
+        // # Swipe up panel on Android
+        if (isAndroid()) {
+            await this.slideUpPanel.swipe('up');
+        }
+
+        await this.deleteAction.tap();
+        const {
+            deletePostTitle,
+            cancelButton,
+            deleteButton,
+        } = Alert;
+        await expect(deletePostTitle).toBeVisible();
+        await expect(cancelButton).toBeVisible();
+        await expect(deleteButton).toBeVisible();
+        if (confirm) {
+            deleteButton.tap();
+            await wait(timeouts.ONE_SEC);
+            await expect(this.postOptions).not.toBeVisible();
+        } else {
+            cancelButton.tap();
+            await wait(timeouts.ONE_SEC);
+            await expect(this.postOptions).toBeVisible();
+            await this.close();
+        }
     }
 }
 

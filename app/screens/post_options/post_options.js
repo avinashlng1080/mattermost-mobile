@@ -20,6 +20,7 @@ import {preventDoubleTap} from '@utils/tap';
 
 import PostOption from './post_option';
 import {OPTION_HEIGHT, getInitialPosition} from './post_options_utils';
+import Bindings from './bindings';
 
 export default class PostOptions extends PureComponent {
     static propTypes = {
@@ -43,13 +44,13 @@ export default class PostOptions extends PureComponent {
         canEdit: PropTypes.bool,
         canMarkAsUnread: PropTypes.bool, //#backwards-compatibility:5.18v
         canEditUntil: PropTypes.number.isRequired,
+        showAppOptions: PropTypes.bool.isRequired,
         currentTeamUrl: PropTypes.string.isRequired,
         currentUserId: PropTypes.string.isRequired,
         deviceHeight: PropTypes.number.isRequired,
         isFlagged: PropTypes.bool,
         post: PropTypes.object.isRequired,
         theme: PropTypes.object.isRequired,
-        isLandscape: PropTypes.bool.isRequired,
     };
 
     static contextTypes = {
@@ -74,7 +75,7 @@ export default class PostOptions extends PureComponent {
 
     getOption = (key, icon, message, onPress, destructive = false) => {
         const {formatMessage} = this.context.intl;
-        const {isLandscape, theme} = this.props;
+        const {theme} = this.props;
         const testID = `post.options.${key}.action`;
 
         return (
@@ -84,7 +85,6 @@ export default class PostOptions extends PureComponent {
                 icon={icon}
                 text={formatMessage(message)}
                 onPress={onPress}
-                isLandscape={isLandscape}
                 destructive={destructive}
                 theme={theme}
             />
@@ -218,7 +218,7 @@ export default class PostOptions extends PureComponent {
     };
 
     getMarkAsUnreadOption = () => {
-        const {post, isLandscape, theme} = this.props;
+        const {post, theme} = this.props;
         const {formatMessage} = this.context.intl;
 
         if (!isSystemMessage(post) && this.props.canMarkAsUnread) {
@@ -229,13 +229,23 @@ export default class PostOptions extends PureComponent {
                     icon='mark-as-unread'
                     text={formatMessage({id: 'mobile.post_info.mark_unread', defaultMessage: 'Mark as Unread'})}
                     onPress={this.handleMarkUnread}
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
             );
         }
         return null;
     };
+
+    getAppsOptions = () => {
+        const {post} = this.props;
+        return (
+            <Bindings
+                key='bindings'
+                post={post}
+                closeWithAnimation={this.closeWithAnimation}
+            />
+        );
+    }
 
     getPostOptions = () => {
         const actions = [
@@ -247,6 +257,7 @@ export default class PostOptions extends PureComponent {
             this.getPinOption(),
             this.getEditOption(),
             this.getDeleteOption(),
+            this.getAppsOptions(),
         ];
 
         return actions.filter((a) => a !== null);

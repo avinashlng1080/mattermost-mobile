@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import {
     Alert,
     Image,
-    Linking,
     Platform,
     StyleSheet,
     StatusBar,
@@ -19,11 +18,11 @@ import ImageViewPort from '@components/image_viewport';
 import PostAttachmentImage from '@components/post_attachment_image';
 import ProgressiveImage from '@components/progressive_image';
 import TouchableWithFeedback from '@components/touchable_with_feedback';
-import CustomPropTypes from '@constants/custom_prop_types';
 import EventEmitter from '@mm-redux/utils/event_emitter';
 import {generateId} from '@utils/file';
 import {calculateDimensions, getViewPortWidth, openGalleryAtIndex} from '@utils/images';
-import {getYouTubeVideoId, isImageLink, isYoutubeLink} from '@utils/url';
+import {getYouTubeVideoId, isImageLink, isYoutubeLink, tryOpenURL} from '@utils/url';
+import EmbeddedBindings from '@components/embedded_bindings';
 
 const MAX_YOUTUBE_IMAGE_HEIGHT = 202;
 const MAX_YOUTUBE_IMAGE_WIDTH = 360;
@@ -36,7 +35,7 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
         actions: PropTypes.shape({
             getRedirectLocation: PropTypes.func.isRequired,
         }).isRequired,
-        baseTextStyle: CustomPropTypes.Style,
+        baseTextStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.array]),
         blockStyles: PropTypes.object,
         deviceHeight: PropTypes.number.isRequired,
         deviceWidth: PropTypes.number.isRequired,
@@ -54,6 +53,7 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
         showLinkPreviews: PropTypes.bool.isRequired,
         theme: PropTypes.object.isRequired,
         textStyles: PropTypes.object,
+        appsEnabled: PropTypes.bool.isRequired,
     };
 
     static contextTypes = {
@@ -166,7 +166,8 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
             imageUrl = link;
         } else if (isYoutubeLink(link)) {
             const videoId = getYouTubeVideoId(link);
-            imageUrl = Object.keys(this.props.metadata.images)[0] || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
+            const images = Object.keys(this.props.metadata?.images || {});
+            imageUrl = images[0] || `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg`;
         }
 
         return imageUrl;
@@ -271,7 +272,21 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
                     startTime,
                 }).catch(this.playYouTubeVideoError);
             } else {
-                Linking.openURL(videoLink);
+                const {intl} = this.context;
+                const onError = () => {
+                    Alert.alert(
+                        intl.formatMessage({
+                            id: 'mobile.link.error.title',
+                            defaultMessage: 'Error',
+                        }),
+                        intl.formatMessage({
+                            id: 'mobile.link.error.text',
+                            defaultMessage: 'Unable to open the link.',
+                        }),
+                    );
+                };
+
+                tryOpenURL(videoLink, onError);
             }
         }
     };
@@ -340,7 +355,7 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
 
         if (attachments && attachments.length) {
             if (!MessageAttachments) {
-                MessageAttachments = require('app/components/message_attachments').default;
+                MessageAttachments = require('@components/message_attachments').default;
             }
 
             return (
@@ -363,8 +378,41 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
         return null;
     };
 
+    renderAppEmbeds = () => {
+        const {
+            postId,
+            postProps,
+            baseTextStyle,
+            blockStyles,
+            deviceHeight,
+            deviceWidth,
+            onPermalinkPress,
+            textStyles,
+            theme,
+        } = this.props;
+        const {app_bindings} = postProps;
+
+        if (app_bindings && app_bindings.length) {
+            return (
+                <EmbeddedBindings
+                    embeds={app_bindings}
+                    baseTextStyle={baseTextStyle}
+                    blockStyles={blockStyles}
+                    deviceHeight={deviceHeight}
+                    deviceWidth={deviceWidth}
+                    postId={postId}
+                    onPermalinkPress={onPermalinkPress}
+                    theme={theme}
+                    textStyles={textStyles}
+                />
+            );
+        }
+
+        return null;
+    }
+
     renderOpenGraph = (isYouTube, isImage) => {
-        const {isReplyPost, link, metadata, openGraphData, postId, showLinkPreviews, theme} = this.props;
+        const {isReplyPost, link, metadata, openGraphData, postId, showLinkPreviews, theme, appsEnabled} = this.props;
 
         if (isYouTube || (isImage && !openGraphData)) {
             return null;
@@ -373,6 +421,13 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
         const attachments = this.renderMessageAttachment();
         if (attachments) {
             return attachments;
+        }
+
+        if (appsEnabled) {
+            const appEmbeds = this.renderAppEmbeds();
+            if (appEmbeds) {
+                return appEmbeds;
+            }
         }
 
         if (!openGraphData || !showLinkPreviews) {
@@ -476,14 +531,15 @@ export default class PostBodyAdditionalContent extends ImageViewPort {
 
     render() {
         let {link} = this.props;
-        const {openGraphData, postProps, expandedLink} = this.props;
+        const {openGraphData, postProps, expandedLink, appsEnabled} = this.props;
         const {linkLoadError} = this.state;
         if (expandedLink) {
             link = expandedLink;
         }
-        const {attachments} = postProps;
 
-        if (!link && !attachments) {
+        const {attachments, app_bindings} = postProps;
+
+        if (!link && !attachments && !(appsEnabled && app_bindings)) {
             return null;
         }
 

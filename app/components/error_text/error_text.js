@@ -5,20 +5,20 @@ import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {Text} from 'react-native';
 
-import CustomPropTypes from 'app/constants/custom_prop_types';
 import FormattedText from 'app/components/formatted_text';
 import {GlobalStyles} from 'app/styles';
 import {makeStyleSheetFromTheme} from 'app/utils/theme';
 
 export default class ErrorText extends PureComponent {
     static propTypes = {
+        testID: PropTypes.string,
         error: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
-        textStyle: CustomPropTypes.Style,
+        textStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.array]),
         theme: PropTypes.object.isRequired,
     };
 
     render() {
-        const {error, textStyle, theme} = this.props;
+        const {testID, error, textStyle, theme} = this.props;
         if (!error) {
             return null;
         }
@@ -29,7 +29,7 @@ export default class ErrorText extends PureComponent {
         if (intl) {
             return (
                 <FormattedText
-                    testID='error.text'
+                    testID={testID}
                     id={intl.id}
                     defaultMessage={intl.defaultMessage}
                     values={intl.values}
@@ -40,7 +40,7 @@ export default class ErrorText extends PureComponent {
 
         return (
             <Text
-                testID='error.text'
+                testID={testID}
                 style={[GlobalStyles.errorLabel, style.errorLabel, textStyle]}
             >
                 {error.message || error}

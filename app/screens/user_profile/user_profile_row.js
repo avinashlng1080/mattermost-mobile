@@ -11,7 +11,6 @@ import {
 
 import CompassIcon from '@components/compass_icon';
 import FormattedText from '@components/formatted_text';
-import {paddingHorizontal as padding} from '@components/safe_area_view/iphone_x_spacing';
 import TouchableWithFeedback from '@components/touchable_with_feedback';
 import {makeStyleSheetFromTheme} from '@utils/theme';
 
@@ -58,7 +57,7 @@ function createTouchableComponent(children, action) {
 }
 
 function userProfileRow(props) {
-    const {action, defaultMessage, detail, icon, textId, togglable, theme, iconSize, shouldRender = true, isLandscape} = props;
+    const {action, defaultMessage, detail, icon, textId, togglable, theme, iconSize, shouldRender = true, testID} = props;
 
     if (!shouldRender) {
         return null;
@@ -75,8 +74,11 @@ function userProfileRow(props) {
     );
 
     const RowComponent = (
-        <View style={style.wrapper}>
-            <View style={[style.container, padding(isLandscape, +15)]}>
+        <View
+            style={style.wrapper}
+            testID={testID}
+        >
+            <View style={style.container}>
                 {iconComponent}
                 <FormattedText
                     style={[style.label]}
@@ -116,7 +118,6 @@ userProfileRow.propTypes = {
     togglable: PropTypes.bool,
     textColor: PropTypes.string,
     theme: PropTypes.object.isRequired,
-    isLandscape: PropTypes.bool.isRequired,
 };
 
 userProfileRow.defaultProps = {
@@ -124,7 +125,6 @@ userProfileRow.defaultProps = {
     iconSize: 15,
     textColor: '#000',
     togglable: false,
-    isLandscape: false,
 };
 
 export default userProfileRow;

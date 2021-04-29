@@ -1,8 +1,9 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Alert, Linking, AlertButton} from 'react-native';
+import {Alert, AlertButton} from 'react-native';
 import {ViewTypes} from '@constants';
+import {tryOpenURL} from '@utils/url';
 
 interface FormatObjectType {
     id: string;
@@ -35,8 +36,8 @@ function unsupportedServerAdminAlert(formatMessage: FormatMessageType) {
         text: formatMessage({id: 'mobile.server_upgrade.learn_more', defaultMessage: 'Learn More'}),
         style: 'cancel',
         onPress: () => {
-            const url = 'https://mattermost.com/blog/support-for-esr-5-9-has-ended/';
-            Linking.openURL(url).catch(() => {
+            const url = 'https://docs.mattermost.com/administration/release-lifecycle.html';
+            const onError = () => {
                 Alert.alert(
                     formatMessage({
                         id: 'mobile.link.error.title',
@@ -47,7 +48,9 @@ function unsupportedServerAdminAlert(formatMessage: FormatMessageType) {
                         defaultMessage: 'Unable to open the link.',
                     }),
                 );
-            });
+            };
+
+            tryOpenURL(url, onError);
         },
     };
     const buttons: AlertButton[] = [cancel, learnMore];

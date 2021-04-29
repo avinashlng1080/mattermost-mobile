@@ -5,11 +5,43 @@ import {Post} from '@support/ui/component';
 
 class SearchResultPostScreen {
     testID = {
-        searchResultPostScreenPrefix: 'search_result_post.',
+        searchResultPostItem: 'search_result_post.post',
     }
 
-    getPost = (postId, text) => {
-        return Post.getPost(this.testID.searchResultPostScreenPrefix, postId, text);
+    getPost = (postId, postMessage, postProfileOptions = {}) => {
+        const {
+            postItem,
+            postItemEmoji,
+            postItemHeaderDateTime,
+            postItemHeaderDisplayName,
+            postItemHeaderGuestTag,
+            postItemHeaderReply,
+            postItemImage,
+            postItemMessage,
+            postItemProfilePicture,
+            postItemProfilePictureUserStatus,
+            postItemShowLessButton,
+            postItemShowMoreButton,
+        } = Post.getPost(this.testID.searchResultPostItem, postId, postMessage, postProfileOptions);
+
+        return {
+            searchResultPostItem: postItem,
+            searchResultPostItemEmoji: postItemEmoji,
+            searchResultPostItemHeaderDateTime: postItemHeaderDateTime,
+            searchResultPostItemHeaderDisplayName: postItemHeaderDisplayName,
+            searchResultPostItemHeaderGuestTag: postItemHeaderGuestTag,
+            searchResultPostItemHeaderReply: postItemHeaderReply,
+            searchResultPostItemImage: postItemImage,
+            searchResultPostItemMessage: postItemMessage,
+            searchResultPostItemProfilePicture: postItemProfilePicture,
+            searchResultPostItemProfilePictureUserStatus: postItemProfilePictureUserStatus,
+            searchResultPostItemShowLessButton: postItemShowLessButton,
+            searchResultPostItemShowMoreButton: postItemShowMoreButton,
+        };
+    }
+
+    getPostMessageAtIndex = (index) => {
+        return Post.getPostMessage(this.testID.searchResultPostItem).atIndex(index);
     }
 }
 
