@@ -12,6 +12,7 @@ import {
     View,
 } from 'react-native';
 import {Navigation} from 'react-native-navigation';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {dismissModal, goToScreen, showSearchModal} from '@actions/navigation';
 import ChannelLoader from '@components/channel_loader';
@@ -213,6 +214,7 @@ export default class RecentMentions extends PureComponent {
                     keyExtractor={this.keyExtractor}
                     keyboardShouldPersistTaps='always'
                     keyboardDismissMode='interactive'
+                    removeClippedSubviews={true}
                     renderItem={this.renderPost}
                     onViewableItemsChanged={this.onViewableItemsChanged}
                 />
@@ -222,13 +224,13 @@ export default class RecentMentions extends PureComponent {
         }
 
         return (
-            <View
+            <SafeAreaView
                 testID='recent_mentions.screen'
                 style={style.container}
             >
                 <StatusBar/>
                 {component}
-            </View>
+            </SafeAreaView>
         );
     }
 }

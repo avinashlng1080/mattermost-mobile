@@ -9,8 +9,9 @@ import RNFetchBlob from 'rn-fetch-blob';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scrollview';
 import DocumentPicker from 'react-native-document-picker';
 import {Navigation} from 'react-native-navigation';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
-import {Client4} from '@mm-redux/client';
+import {Client4} from '@client/rest';
 import {getFormattedFileSize} from '@mm-redux/utils/file_utils';
 
 import {buildFileUploadData, encodeHeaderURIStringToUTF8} from 'app/utils/file';
@@ -108,6 +109,7 @@ export default class EditProfile extends PureComponent {
         id: 'update-profile',
         enabled: false,
         showAsAction: 'always',
+        testID: 'edit_profile.save.button',
     };
 
     constructor(props, context) {
@@ -333,6 +335,7 @@ export default class EditProfile extends PureComponent {
                 theme={theme}
                 value={firstName}
                 isLandscape={isLandscape}
+                testID='edit_profile.text_setting.first_name'
             />
         );
     };
@@ -356,6 +359,7 @@ export default class EditProfile extends PureComponent {
                     theme={theme}
                     value={lastName}
                     isLandscape={isLandscape}
+                    testID='edit_profile.text_setting.last_name'
                 />
             </View>
         );
@@ -381,6 +385,7 @@ export default class EditProfile extends PureComponent {
                 theme={theme}
                 value={username}
                 isLandscape={isLandscape}
+                testID='edit_profile.text_setting.username'
             />
         );
     };
@@ -443,6 +448,7 @@ export default class EditProfile extends PureComponent {
                     theme={theme}
                     value={email}
                     isLandscape={isLandscape}
+                    testID='edit_profile.text_setting.email'
                 />
             </View>
         );
@@ -468,6 +474,7 @@ export default class EditProfile extends PureComponent {
                 value={nickname}
                 isLandscape={isLandscape}
                 optional={true}
+                testID='edit_profile.text_setting.nickname'
             />
         );
     };
@@ -492,6 +499,7 @@ export default class EditProfile extends PureComponent {
                 value={position}
                 isLandscape={isLandscape}
                 optional={true}
+                testID='edit_profile.text_setting.position'
             />
         );
     };
@@ -524,6 +532,7 @@ export default class EditProfile extends PureComponent {
                 edit={!profilePictureDisabled}
                 imageUri={uri}
                 profileImageRemove={profileImageRemove}
+                testID='edit_profile.profile_picture'
             />
         );
 
@@ -569,10 +578,10 @@ export default class EditProfile extends PureComponent {
 
         if (updating) {
             return (
-                <View style={[style.container, style.flex]}>
+                <SafeAreaView style={[style.container, style.flex]}>
                     <StatusBar/>
                     <Loading color={theme.centerChannelColor}/>
-                </View>
+                </SafeAreaView>
             );
         }
 
@@ -582,6 +591,7 @@ export default class EditProfile extends PureComponent {
                 <View style={style.errorContainer}>
                     <View style={style.errorWrapper}>
                         <ErrorText
+                            testID='edit_profile.error.text'
                             error={error}
                             textStyle={style.errorText}
                         />
@@ -591,11 +601,15 @@ export default class EditProfile extends PureComponent {
         }
 
         return (
-            <View style={style.flex}>
+            <SafeAreaView
+                testID='edit_profile.screen'
+                style={style.flex}
+            >
                 <StatusBar/>
                 <KeyboardAwareScrollView
                     bounces={false}
                     innerRef={this.scrollViewRef}
+                    testID='edit_profile.scroll_view'
                 >
                     {displayError}
                     <View style={[style.scrollView]}>
@@ -614,7 +628,7 @@ export default class EditProfile extends PureComponent {
                         <View style={style.footer}/>
                     </View>
                 </KeyboardAwareScrollView>
-            </View>
+            </SafeAreaView>
         );
     }
 }

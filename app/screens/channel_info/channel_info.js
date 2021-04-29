@@ -9,6 +9,7 @@ import {
     View,
 } from 'react-native';
 import {Navigation} from 'react-native-navigation';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {dismissModal} from '@actions/navigation';
 import StatusBar from '@components/status_bar';
@@ -29,6 +30,7 @@ import ManageMembers from './manage_members';
 import Mute from './mute';
 import Pinned from './pinned';
 import Separator from './separator';
+import Bindings from './bindings';
 
 export default class ChannelInfo extends PureComponent {
     static propTypes = {
@@ -43,11 +45,9 @@ export default class ChannelInfo extends PureComponent {
         currentChannelGuestCount: PropTypes.number,
         currentChannelMemberCount: PropTypes.number,
         currentUserId: PropTypes.string,
-        isBot: PropTypes.bool.isRequired,
-        isLandscape: PropTypes.bool.isRequired,
         isTeammateGuest: PropTypes.bool.isRequired,
         isDirectMessage: PropTypes.bool.isRequired,
-        status: PropTypes.string,
+        teammateId: PropTypes.string,
         theme: PropTypes.object.isRequired,
     };
 
@@ -96,12 +96,11 @@ export default class ChannelInfo extends PureComponent {
     };
 
     actionsRows = (channelIsArchived) => {
-        const {currentChannel, currentUserId, isLandscape, isDirectMessage, theme} = this.props;
+        const {currentChannel, currentUserId, isDirectMessage, theme} = this.props;
 
         if (channelIsArchived) {
             return (
                 <ManageMembers
-                    isLandscape={isLandscape}
                     theme={theme}
                     separator={false}
                 />);
@@ -112,14 +111,12 @@ export default class ChannelInfo extends PureComponent {
                 <Favorite
                     testID='channel_info.favorite.action'
                     channelId={currentChannel.id}
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
                 <Separator theme={theme}/>
                 <Mute
                     testID='channel_info.mute.action'
                     channelId={currentChannel.id}
-                    isLandscape={isLandscape}
                     userId={currentUserId}
                     theme={theme}
                 />
@@ -127,7 +124,6 @@ export default class ChannelInfo extends PureComponent {
                 <IgnoreMentions
                     testID='channel_info.ignore_mentions.action'
                     channelId={currentChannel.id}
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
                 <Separator theme={theme}/>
@@ -135,36 +131,33 @@ export default class ChannelInfo extends PureComponent {
                 <>
                     <NotificationPreference
                         testID='channel_info.notification_preference.action'
-                        isLandscape={isLandscape}
                         theme={theme}
                     />
                     <Separator theme={theme}/>
                 </>
                 }
                 <Pinned
-                    testID='channel_info.pinned.action'
+                    testID='channel_info.pinned_messages.action'
                     channelId={currentChannel.id}
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
                 <ManageMembers
                     testID='channel_info.manage_members.action'
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
                 <AddMembers
                     testID='channel_info.add_members.action'
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
                 <ConvertPrivate
                     testID='channel_info.convert_private.action'
-                    isLandscape={isLandscape}
                     theme={theme}
                 />
                 <EditChannel
                     testID='channel_info.edit_channel.action'
-                    isLandscape={isLandscape}
+                    theme={theme}
+                />
+                <Bindings
                     theme={theme}
                 />
             </>
@@ -177,24 +170,24 @@ export default class ChannelInfo extends PureComponent {
             currentChannelCreatorName,
             currentChannelMemberCount,
             currentChannelGuestCount,
-            status,
+            teammateId,
             theme,
-            isBot,
             isTeammateGuest,
-            isLandscape,
         } = this.props;
 
         const style = getStyleSheet(theme);
         const channelIsArchived = currentChannel.delete_at !== 0;
 
         return (
-            <View
+            <SafeAreaView
                 testID='channel_info.screen'
                 style={style.container}
+                edges={['bottom', 'left', 'right']}
             >
                 <StatusBar/>
                 <ScrollView
                     style={style.scrollView}
+                    testID='channel_info.scroll_view'
                 >
                     {Boolean(currentChannel?.id) &&
                     <ChannelInfoHeader
@@ -205,15 +198,14 @@ export default class ChannelInfo extends PureComponent {
                         memberCount={currentChannelMemberCount}
                         onPermalinkPress={this.handlePermalinkPress}
                         purpose={currentChannel.purpose}
-                        status={status}
+                        teammateId={teammateId}
                         theme={theme}
                         type={currentChannel.type}
                         isArchived={channelIsArchived}
-                        isBot={isBot}
                         isTeammateGuest={isTeammateGuest}
                         hasGuests={currentChannelGuestCount > 0}
                         isGroupConstrained={currentChannel.group_constrained}
-                        isLandscape={isLandscape}
+                        testID='channel_info.header'
                     />
                     }
                     <View style={style.rowsContainer}>
@@ -222,17 +214,17 @@ export default class ChannelInfo extends PureComponent {
                     <View style={style.footer}>
                         <Leave
                             close={this.close}
-                            isLandscape={isLandscape}
+                            testID='channel_info.leave.action'
                             theme={theme}
                         />
                         <Archive
                             close={this.close}
-                            isLandscape={isLandscape}
+                            testID='channel_info.archive.action'
                             theme={theme}
                         />
                     </View>
                 </ScrollView>
-            </View>
+            </SafeAreaView>
         );
     }
 }

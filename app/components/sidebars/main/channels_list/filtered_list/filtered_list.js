@@ -13,18 +13,19 @@ import {
 } from 'react-native';
 import {injectIntl, intlShape} from 'react-intl';
 
+import ChannelItem from '@components/sidebars/main/channels_list/channel_item';
+import {ListTypes} from '@constants';
 import {General} from '@mm-redux/constants';
 import {sortChannelsByDisplayName} from '@mm-redux/utils/channel_utils';
 import {displayUsername} from '@mm-redux/utils/user_utils';
-import {t} from 'app/utils/i18n';
-import ChannelItem from 'app/components/sidebars/main/channels_list/channel_item';
-import {ListTypes} from 'app/constants';
-import {paddingLeft} from 'app/components/safe_area_view/iphone_x_spacing';
+import {t} from '@utils/i18n';
+import memoize from 'memoize-one';
 
 const VIEWABILITY_CONFIG = ListTypes.VISIBILITY_CONFIG_DEFAULTS;
 
 class FilteredList extends Component {
     static propTypes = {
+        testID: PropTypes.string,
         actions: PropTypes.shape({
             getProfilesInTeam: PropTypes.func.isRequired,
             makeGroupMessageVisibleIfNecessary: PropTypes.func.isRequired,
@@ -50,7 +51,6 @@ class FilteredList extends Component {
         styles: PropTypes.object.isRequired,
         term: PropTypes.string,
         theme: PropTypes.object.isRequired,
-        isLandscape: PropTypes.bool.isRequired,
     };
 
     static defaultProps = {
@@ -67,7 +67,6 @@ class FilteredList extends Component {
         };
 
         this.state = {
-            dataSource: this.buildData(props),
         };
     }
 
@@ -81,14 +80,16 @@ class FilteredList extends Component {
         return !deepEqual(this.props, nextProps, {strict: true}) || !deepEqual(this.state, nextState, {strict: true});
     }
 
-    componentWillReceiveProps(nextProps) {
-        if (this.props.term !== nextProps.term) {
-            const {actions, currentTeam} = this.props;
-            const {term} = nextProps;
+    setDataSourceAndTerm(dataSource, term) {
+        this.setState({dataSource, term});
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.term !== this.props.term) {
+            const {actions, currentTeam, term} = this.props;
             const {searchChannels, searchProfiles} = actions;
             const dataSource = this.buildData(this.props, term);
-
-            this.setState({dataSource, term});
+            this.setDataSourceAndTerm(dataSource, term);
             clearTimeout(this.searchTimeoutId);
 
             this.searchTimeoutId = setTimeout(() => {
@@ -178,7 +179,7 @@ class FilteredList extends Component {
     };
 
     buildCurrentDMSForSearch = (props, term) => {
-        const {channels, teammateNameDisplay, profiles, statuses, pastDirectMessages, groupChannelMemberDetails} = props;
+        const {channels, currentUserId, teammateNameDisplay, profiles, pastDirectMessages, groupChannelMemberDetails} = props;
         const {favoriteChannels} = channels;
 
         const favoriteDms = favoriteChannels.filter((c) => {
@@ -205,7 +206,6 @@ class FilteredList extends Component {
 
             return {
                 id: u.id,
-                status: statuses[u.id],
                 display_name: displayName,
                 username: u.username,
                 email: u.email,
@@ -214,10 +214,7 @@ class FilteredList extends Component {
                 nickname: u.nickname,
                 fullname: `${u.first_name} ${u.last_name}`,
                 delete_at: u.delete_at,
-                isBot: u.is_bot,
-
-                // need name key for DM's as we use it for sortChannelsByDisplayName with same display_name
-                name: displayName,
+                name: `${currentUserId}__${u.id}`,
             };
         });
 
@@ -232,7 +229,7 @@ class FilteredList extends Component {
     }
 
     buildMembersForSearch = (props, term) => {
-        const {channels, currentUserId, teammateNameDisplay, profiles, teamProfiles, statuses, pastDirectMessages, restrictDms} = props;
+        const {channels, currentUserId, teammateNameDisplay, profiles, teamProfiles, pastDirectMessages, restrictDms} = props;
         const {favoriteChannels, unreadChannels} = channels;
 
         const favoriteAndUnreadDms = [...favoriteChannels, ...unreadChannels].filter((c) => {
@@ -250,17 +247,15 @@ class FilteredList extends Component {
 
             return {
                 id: u.id,
-                status: statuses[u.id],
                 display_name: displayName,
                 username: u.username,
                 email: u.email,
-                name: displayName,
+                name: `${currentUserId}__${u.id}`,
                 type: General.DM_CHANNEL,
                 fake: true,
                 nickname: u.nickname,
                 fullname: `${u.first_name} ${u.last_name}`,
                 delete_at: u.delete_at,
-                isBot: u.is_bot,
             };
         });
 
@@ -330,19 +325,22 @@ class FilteredList extends Component {
         return sections;
     };
 
-    buildData = (props, term) => {
+    buildData = memoize((props) => {
         if (!props.currentChannel) {
             return null;
         }
-
-        return this.buildSectionsForSearch(props, term);
-    };
+        return this.buildSectionsForSearch(props, props.term);
+    }, ([props], [prevProps]) => props.term === prevProps.term);
 
     keyExtractor = (item) => item.id || item;
 
     renderItem = ({item}) => {
+        const {testID} = this.props;
+        const channelItemTestID = `${testID}.channel_item`;
+
         return (
             <ChannelItem
+                testID={channelItemTestID}
                 channelId={item.id}
                 channel={item}
                 isSearchResult={true}
@@ -354,35 +352,32 @@ class FilteredList extends Component {
     };
 
     renderSectionHeader = ({section}) => {
-        const {intl, isLandscape, styles} = this.props;
+        const {intl, styles} = this.props;
         const {
             defaultMessage,
             id,
         } = section;
 
         return (
-            <React.Fragment>
-                <View style={[styles.titleContainer, paddingLeft(isLandscape)]}>
-                    <Text style={styles.title}>
-                        {intl.formatMessage({id, defaultMessage}).toUpperCase()}
-                    </Text>
-                    <View style={styles.separatorContainer}>
-                        <View style={styles.separator}/>
-                    </View>
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>
+                    {intl.formatMessage({id, defaultMessage}).toUpperCase()}
+                </Text>
+                <View style={styles.separatorContainer}>
+                    <View style={styles.separator}/>
                 </View>
-            </React.Fragment>
+            </View>
         );
     };
 
     render() {
-        const {styles} = this.props;
-        const {dataSource} = this.state;
+        const {styles, testID} = this.props;
+        const dataSource = this.buildData(this.props);
         return (
-            <View
-                style={styles.container}
-            >
+            <View style={styles.container}>
                 <SectionList
                     sections={dataSource}
+                    removeClippedSubviews={true}
                     renderItem={this.renderItem}
                     renderSectionHeader={this.renderSectionHeader}
                     keyExtractor={this.keyExtractor}
@@ -390,6 +385,7 @@ class FilteredList extends Component {
                     keyboardShouldPersistTaps={'always'}
                     maxToRenderPerBatch={10}
                     stickySectionHeadersEnabled={true}
+                    testID={testID}
                     viewabilityConfig={VIEWABILITY_CONFIG}
                 />
             </View>

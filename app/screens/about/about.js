@@ -4,21 +4,23 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {
-    Linking,
+    Alert,
     ScrollView,
     Text,
     TouchableOpacity,
     View,
 } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {intlShape} from 'react-intl';
 
 import Config from '@assets/config';
 import CompassIcon from '@components/compass_icon';
 import FormattedText from '@components/formatted_text';
-import {paddingHorizontal as padding} from '@components/safe_area_view/iphone_x_spacing';
 import StatusBar from '@components/status_bar';
 import AboutLinks from '@constants/about_links';
 import {changeOpacity, makeStyleSheetFromTheme} from '@utils/theme';
+import {tryOpenURL} from '@utils/url';
 
 const MATTERMOST_BUNDLE_IDS = ['com.mattermost.rnbeta', 'com.mattermost.rn'];
 
@@ -27,35 +29,56 @@ export default class About extends PureComponent {
         config: PropTypes.object.isRequired,
         license: PropTypes.object.isRequired,
         theme: PropTypes.object.isRequired,
-        isLandscape: PropTypes.bool.isRequired,
+    };
+
+    static contextTypes = {
+        intl: intlShape.isRequired,
+    };
+
+    openURL = (url) => {
+        const {intl} = this.context;
+        const onError = () => {
+            Alert.alert(
+                intl.formatMessage({
+                    id: 'mobile.link.error.title',
+                    defaultMessage: 'Error',
+                }),
+                intl.formatMessage({
+                    id: 'mobile.link.error.text',
+                    defaultMessage: 'Unable to open the link.',
+                }),
+            );
+        };
+
+        tryOpenURL(url, onError);
     };
 
     handleAboutTeam = () => {
-        Linking.openURL(Config.AboutTeamURL);
+        this.openURL(Config.AboutTeamURL);
     };
 
     handleAboutEnterprise = () => {
-        Linking.openURL(Config.AboutEnterpriseURL);
+        this.openURL(Config.AboutEnterpriseURL);
     };
 
     handlePlatformNotice = () => {
-        Linking.openURL(Config.PlatformNoticeURL);
+        this.openURL(Config.PlatformNoticeURL);
     };
 
     handleMobileNotice = () => {
-        Linking.openURL(Config.MobileNoticeURL);
+        this.openURL(Config.MobileNoticeURL);
     };
 
     handleTermsOfService = () => {
-        Linking.openURL(AboutLinks.TERMS_OF_SERVICE);
+        this.openURL(AboutLinks.TERMS_OF_SERVICE);
     };
 
     handlePrivacyPolicy = () => {
-        Linking.openURL(AboutLinks.PRIVACY_POLICY);
+        this.openURL(AboutLinks.PRIVACY_POLICY);
     }
 
     render() {
-        const {theme, config, license, isLandscape} = this.props;
+        const {theme, config, license} = this.props;
         const style = getStyleSheet(theme);
 
         let title = (
@@ -63,6 +86,7 @@ export default class About extends PureComponent {
                 id='about.teamEditiont0'
                 defaultMessage='Team Edition'
                 style={style.title}
+                testID='about.title'
             />
         );
 
@@ -71,6 +95,7 @@ export default class About extends PureComponent {
                 id='about.teamEditionSt'
                 defaultMessage='All your team communication in one place, instantly searchable and accessible anywhere.'
                 style={style.subtitle}
+                testID='about.subtitle'
             />
         );
 
@@ -80,11 +105,15 @@ export default class About extends PureComponent {
                     id='about.teamEditionLearn'
                     defaultMessage='Join the Mattermost community at '
                     style={style.learn}
+                    testID='about.learn_more'
                 />
                 <TouchableOpacity
                     onPress={this.handleAboutTeam}
                 >
-                    <Text style={style.learnLink}>
+                    <Text
+                        style={style.learnLink}
+                        testID='about.learn_more.url'
+                    >
                         {Config.TeamEditionLearnURL}
                     </Text>
                 </TouchableOpacity>
@@ -98,6 +127,7 @@ export default class About extends PureComponent {
                     id='about.teamEditiont1'
                     defaultMessage='Enterprise Edition'
                     style={style.title}
+                    testID='about.title'
                 />
             );
 
@@ -106,6 +136,7 @@ export default class About extends PureComponent {
                     id='about.enterpriseEditionSt'
                     defaultMessage='Modern communication from behind your firewall.'
                     style={style.subtitle}
+                    testID='about.subtitle'
                 />
             );
 
@@ -115,11 +146,15 @@ export default class About extends PureComponent {
                         id='about.enterpriseEditionLearn'
                         defaultMessage='Learn more about Enterprise Edition at '
                         style={style.learn}
+                        testID='about.learn_more'
                     />
                     <TouchableOpacity
                         onPress={this.handleAboutEnterprise}
                     >
-                        <Text style={style.learnLink}>
+                        <Text
+                            style={style.learnLink}
+                            testID='about.learn_more.url'
+                        >
                             {Config.EELearnURL}
                         </Text>
                     </TouchableOpacity>
@@ -132,6 +167,7 @@ export default class About extends PureComponent {
                         id='about.enterpriseEditione1'
                         defaultMessage='Enterprise Edition'
                         style={style.title}
+                        testID='about.title'
                     />
                 );
 
@@ -144,6 +180,7 @@ export default class About extends PureComponent {
                             values={{
                                 company: license.Company,
                             }}
+                            testID='about.licensee'
                         />
                     </View>
                 );
@@ -160,6 +197,7 @@ export default class About extends PureComponent {
                     values={{
                         version: config.Version,
                     }}
+                    testID='about.server_version'
                 />
             );
         } else {
@@ -172,6 +210,7 @@ export default class About extends PureComponent {
                         version: config.Version,
                         number: config.BuildNumber,
                     }}
+                    testID='about.server_version'
                 />
             );
         }
@@ -184,6 +223,7 @@ export default class About extends PureComponent {
                     defaultMessage='Terms of Service'
                     style={style.noticeLink}
                     onPress={this.handleTermsOfService}
+                    testID='about.terms_of_service'
                 />
             );
         }
@@ -196,6 +236,7 @@ export default class About extends PureComponent {
                     defaultMessage='Privacy Policy'
                     style={style.noticeLink}
                     onPress={this.handlePrivacyPolicy}
+                    testID='about.privacy_policy'
                 />
             );
         }
@@ -210,22 +251,31 @@ export default class About extends PureComponent {
         }
 
         return (
-            <View style={style.wrapper}>
+            <SafeAreaView
+                edges={['left', 'right']}
+                style={style.container}
+                testID='about.screen'
+            >
                 <StatusBar/>
                 <ScrollView
-                    style={[style.scrollView, padding(isLandscape)]}
+                    style={style.scrollView}
                     contentContainerStyle={style.scrollViewContent}
+                    testID='about.scroll_view'
                 >
                     <View style={style.logoContainer}>
                         <CompassIcon
                             name='mattermost'
                             color={theme.centerChannelColor}
                             size={120}
+                            testID='about.logo'
                         />
                     </View>
                     <View style={style.infoContainer}>
                         <View style={style.titleContainer}>
-                            <Text style={style.title}>
+                            <Text
+                                style={style.title}
+                                testID='about.site_name'
+                            >
                                 {`${config.SiteName} `}
                             </Text>
                             {title}
@@ -239,6 +289,7 @@ export default class About extends PureComponent {
                                 version: DeviceInfo.getVersion(),
                                 number: DeviceInfo.getBuildNumber(),
                             }}
+                            testID='about.app_version'
                         />
                         {serverVersion}
                         <FormattedText
@@ -248,6 +299,7 @@ export default class About extends PureComponent {
                             values={{
                                 type: config.SQLDriverName,
                             }}
+                            testID='about.database'
                         />
                         {licensee}
                         {learnMore}
@@ -259,6 +311,7 @@ export default class About extends PureComponent {
                                 values={{
                                     site: this.props.config.SiteName,
                                 }}
+                                testID='about.powered_by'
                             />
                         }
                         <FormattedText
@@ -268,6 +321,7 @@ export default class About extends PureComponent {
                             values={{
                                 currentYear: new Date().getFullYear(),
                             }}
+                            testID='about.copyright'
                         />
                         <View style={style.tosPrivacyContainer}>
                             {termsOfService}
@@ -298,6 +352,7 @@ export default class About extends PureComponent {
                                             />
                                         ),
                                     }}
+                                    testID='about.notice_text'
                                 />
                             </View>
                         </View>
@@ -307,8 +362,12 @@ export default class About extends PureComponent {
                                     id='about.hash'
                                     defaultMessage='Build Hash:'
                                     style={style.footerTitleText}
+                                    testID='about.build_hash.title'
                                 />
-                                <Text style={style.footerText}>
+                                <Text
+                                    style={style.footerText}
+                                    testID='about.build_hash.value'
+                                >
                                     {config.BuildHash}
                                 </Text>
                             </View>
@@ -317,8 +376,12 @@ export default class About extends PureComponent {
                                     id='about.hashee'
                                     defaultMessage='EE Build Hash:'
                                     style={style.footerTitleText}
+                                    testID='about.build_hash_enterprise.title'
                                 />
-                                <Text style={style.footerText}>
+                                <Text
+                                    style={style.footerText}
+                                    testID='about.build_hash_enterprise.value'
+                                >
                                     {config.BuildHashEnterprise}
                                 </Text>
                             </View>
@@ -328,21 +391,25 @@ export default class About extends PureComponent {
                                 id='about.date'
                                 defaultMessage='Build Date:'
                                 style={style.footerTitleText}
+                                testID='about.build_date.title'
                             />
-                            <Text style={style.footerText}>
+                            <Text
+                                style={style.footerText}
+                                testID='about.build_date.value'
+                            >
                                 {config.BuildDate}
                             </Text>
                         </View>
                     </View>
                 </ScrollView>
-            </View>
+            </SafeAreaView>
         );
     }
 }
 
 const getStyleSheet = makeStyleSheetFromTheme((theme) => {
     return {
-        wrapper: {
+        container: {
             flex: 1,
         },
         scrollView: {

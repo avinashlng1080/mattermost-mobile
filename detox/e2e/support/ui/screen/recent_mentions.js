@@ -16,8 +16,8 @@ class RecentMentionsScreen {
     recentMentionsScreen = element(by.id(this.testID.recentMentionsScreen));
     closeSettingsButton = element(by.id(this.testID.closeSettingsButton));
 
-    getSearchResultPostItem = (postId, text) => {
-        return SearchResultPostScreen.getPost(postId, text);
+    getSearchResultPostItem = (postId, text, postProfileOptions = {}) => {
+        return SearchResultPostScreen.getPost(postId, text, postProfileOptions);
     }
 
     toBeVisible = async () => {
@@ -39,11 +39,11 @@ class RecentMentionsScreen {
     }
 
     openPostOptionsFor = async (postId, text) => {
-        const post = await this.getSearchResultPostItem(postId, text);
-        await expect(post).toBeVisible();
+        const {searchResultPostItem} = await this.getSearchResultPostItem(postId, text);
+        await expect(searchResultPostItem).toBeVisible();
 
         // # Open post options
-        await post.longPress();
+        await searchResultPostItem.longPress();
         await PostOptions.toBeVisible();
     }
 }

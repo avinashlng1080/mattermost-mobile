@@ -9,9 +9,7 @@ import {
 } from 'react-native';
 
 import CompassIcon from '@components/compass_icon';
-import {paddingLeft as padding} from '@components/safe_area_view/iphone_x_spacing';
 import ConditionalTouchable from '@components/conditional_touchable';
-import CustomPropTypes from '@constants/custom_prop_types';
 
 export default class CustomListRow extends React.PureComponent {
     static propTypes = {
@@ -19,15 +17,12 @@ export default class CustomListRow extends React.PureComponent {
         enabled: PropTypes.bool,
         selectable: PropTypes.bool,
         selected: PropTypes.bool,
-        children: CustomPropTypes.Children,
-        item: PropTypes.object,
-        isLandscape: PropTypes.bool.isRequired,
+        children: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf([PropTypes.node])]),
         testID: PropTypes.string,
     };
 
     static defaultProps = {
         enabled: true,
-        isLandscape: false,
     };
 
     render() {
@@ -38,7 +33,7 @@ export default class CustomListRow extends React.PureComponent {
                 style={style.touchable}
                 testID={this.props.testID}
             >
-                <View style={[style.container, padding(this.props.isLandscape)]}>
+                <View style={style.container}>
                     {this.props.selectable &&
                         <View style={style.selectorContainer}>
                             <View style={[style.selector, (this.props.selected && style.selectorFilled), (!this.props.enabled && style.selectorDisabled)]}>

@@ -77,7 +77,9 @@ const ViewTypes = keyMirror({
     REMOVE_LAST_CHANNEL_FOR_TEAM: null,
 
     GITLAB: null,
+    GOOGLE: null,
     OFFICE365: null,
+    OPENID: null,
     SAML: null,
 
     SET_INITIAL_POST_VISIBILITY: null,
@@ -90,6 +92,7 @@ const ViewTypes = keyMirror({
     SET_LAST_UPGRADE_CHECK: null,
 
     ADD_RECENT_EMOJI: null,
+    ADD_RECENT_EMOJI_ARRAY: null,
     ANNOUNCEMENT_BANNER: null,
 
     INCREMENT_EMOJI_PICKER_PAGE: null,
@@ -105,13 +108,14 @@ const ViewTypes = keyMirror({
     LANDSCAPE: null,
 
     INDICATOR_BAR_VISIBLE: null,
+    CHANNEL_NAV_BAR_CHANGED: null,
 });
 
 const RequiredServer = {
-    FULL_VERSION: 5.25,
+    FULL_VERSION: '5.31.3',
     MAJOR_VERSION: 5,
-    MIN_VERSION: 25,
-    PATCH_VERSION: 0,
+    MIN_VERSION: 31,
+    PATCH_VERSION: 3,
 };
 
 export default {
@@ -133,7 +137,10 @@ export default {
     PROFILE_PICTURE_EMOJI_SIZE: 28,
     DATA_SOURCE_USERS: 'users',
     DATA_SOURCE_CHANNELS: 'channels',
+    DATA_SOURCE_DYNAMIC: 'dynamic',
     NotificationLevels,
     SidebarSectionTypes,
     IOS_HORIZONTAL_LANDSCAPE: 44,
+    INDICATOR_BAR_HEIGHT,
+    AVATAR_LIST_PICTURE_SIZE: 24,
 };
